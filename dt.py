@@ -6,7 +6,7 @@ url = "https://api.data.go.kr/openapi/tn_pubr_public_free_mlsv_api"
 service_key = (
     "b5e45281de993a79599011f7a1db4389d01d3cba98ffd28f01b04209ddf56696"
 )
-
+df_toilet = pd.read_csv('public_toilet_위경도.csv')
 # 요청 파라미터 설정
 def make_map():
     params1 = {
@@ -68,9 +68,24 @@ def make_map():
             folium.Marker(
                 location=[lat, lon],
                 popup=f"<b>{row.get('fcltyNm', '정보 없음')}</b>",
-                icon=folium.Icon(color="blue", icon="info-sign"),
+                icon=folium.Icon(color="blue", icon="utensils",prefix="fa"),
             ).add_to(m)
+            # print("급식소 성공")
+        except (ValueError, TypeError):
+            continue
+    for index, row in df_toilet.iterrows():
+        try:
+            lat = float(row["위도"])
+            lon = float(row["경도"])
+
+            folium.Marker(
+                location=[lat, lon],
+                popup=f"<b>{row.get('화장실명', '정보 없음')}</b>",
+                icon=folium.Icon(color="blue", icon="restroom",prefix="fa"),
+            ).add_to(m)
+            # print("화장실 성공")
         except (ValueError, TypeError):
             continue
 
     m.save("./templates/map.html")
+    print("맵 업로드 성공")
